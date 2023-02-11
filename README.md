@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Guiding Scene Text Question Answering with Region Priors
 本代码是基于[Ssbaseline](https://github.com/ZephyrZhuQi/ssbaseline) 和 [M4C](https://github.com/ronghanghu/mmf/tree/project/m4c_captioner_pre_release/projects/M4C)。
@@ -56,3 +57,7 @@ CUDA_VISIBLE_DEVICES=0 python tools/run.py --tasks vqa --datasets tqd_textvqa \
 
 
 
+=======
+# TextVQA_ROQ
+TextVQA code
+>>>>>>> ccd77f061b5ba8881f219a34448dbd1e8b9fba78
