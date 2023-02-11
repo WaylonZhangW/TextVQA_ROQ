@@ -55,9 +55,3 @@ CUDA_VISIBLE_DEVICES=0 python tools/run.py --tasks vqa --datasets tqd_textvqa \
 
 
 
-
-
-=======
-# TextVQA_ROQ
-TextVQA code
->>>>>>> ccd77f061b5ba8881f219a34448dbd1e8b9fba78
