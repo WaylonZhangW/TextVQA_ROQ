@@ -1,0 +1,17 @@
+torch==1.8.1
+torchvision==0.9.1
+tensorboardX
+numpy
+tqdm
+demjson
+torchtext==0.9.1
+GitPython
+PyYAML
+pytest
+requests
+fasttext
+nltk
+pytorch-transformers
+editdistance
+
+

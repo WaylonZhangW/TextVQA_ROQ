@@ -1,0 +1,144 @@
+includes:
+  - common/defaults/configs/datasets/vqa/tqd_textvqa.yml
+# Use soft copy
+dataset_attributes:
+  tqd_textvqa:
+    image_features:
+      train:
+        - textvqa_gcy/train,microsoft_ocr_features/textvqa_ocr_roi_feature/train
+      val:
+        - textvqa_gcy/train,microsoft_ocr_features/textvqa_ocr_roi_feature/train
+      test:
+        - textvqa_gcy/test,microsoft_ocr_features/textvqa_ocr_roi_feature/test
+    imdb_files:
+      train:
+        - imdb/microsoft_ocr/microsoftOCR_loss_train.npy
+      val:
+        - imdb/microsoft_ocr/microsoftOCR_spatial_val.npy
+      test:
+        - imdb/microsoft_ocr/microsoftOCR_spatial_test.npy
+    processors:
+      text_processor:
+        type: bert_tokenizer
+        params:
+          max_length: 20
+
+      ocr_text_processor:
+        type: bert_tokenizer_ocr
+        params:
+          max_length: 50
+
+      obj_text_processor:
+        type: bert_tokenizer_ocr
+        params:
+          max_length: 100
+      answer_processor:
+        type: m4c_answer
+        params:
+          vocab_file: m4c_vocabs/textvqa/fixed_answer_vocab_textvqa_5k.txt
+          preprocessor:
+            type: simple_word
+            params: {}
+          context_preprocessor:
+            type: simple_word
+            params: {}
+          max_length: 50
+          max_copy_steps: 12
+          num_answers: 10
+      copy_processor:
+        type: copy
+        params:
+          max_length: 100
+      phoc_processor:
+        type: phoc
+        params:
+          max_length: 50
+model_attributes:
+  tqd:
+    lr_scale_frcn: 0.1
+    lr_scale_text_bert: 0.1
+    lr_scale_mmt: 1.0  # no scaling
+    lr_scale_ocrs_attention: 1.0
+    text_bert_init_from_bert_base: true
+    scale: 20   # scale of bbox and ocr
+    text_bert:
+      num_hidden_layers: 3
+    obj:
+      mmt_in_dim: 2816
+      dropout_prob: 0.1
+    ocr:
+      mmt_in_dim: 2184   #1928  # 300 (FastText) + 604 (PHOC) + 512 (Faster R-CNN ROI) + 512(RecogCNN)
+      dropout_prob: 0.1
+    mmt:
+      hidden_size: 768
+      num_hidden_layers: 8
+    ocr_attention:
+      hidden_size: 512
+      num_hidden_layers: 4
+      num_attention_heads: 8
+    classifier:
+      type: linear
+      ocr_max_num: 50
+      ocr_ptr_net:
+        hidden_size: 768
+        query_key_size: 768
+      params: {}
+    text_embeddings:
+      type: attention_two
+      params:
+        hidden_dim: 768
+        num_layers: 1
+        conv1_out: 512
+        conv2_out: 2
+        dropout: 0
+        embedding_dim: 768
+        kernel_size: 1
+        padding: 0
+    image_feature_embeddings:
+      modal_combine:
+        type: non_linear_element_multiply
+        params:
+          dropout: 0
+          hidden_dim: 5000
+      normalization: softmax
+      transform:
+        type: linear
+        params:
+          out_dim: 1
+    model_data_dir: /public/home/zhangwei1/datasets/data
+    metrics:
+      - type: textvqa_accuracy
+    losses:
+      - type: m4c_decoding_bce_with_obj_loss
+      # - type: m4c_decoding_bce_with_mask
+optimizer_attributes:
+  params:
+    eps: 1.0e-08
+    lr: 1e-4
+    weight_decay: 0
+  type: Adam
+training_parameters:
+  clip_norm_mode: all
+  clip_gradients: true
+  max_grad_l2_norm: 0.25
+  lr_scheduler: true
+  lr_steps:
+    - 14000
+    - 15000
+  lr_ratio: 0.1
+  use_warmup: true
+  warmup_factor: 0.2
+  warmup_iterations: 1000
+  max_iterations: 34000
+  batch_size: 128
+  num_workers: 4
+  task_size_proportional_sampling: true
+  monitored_metric: tqd_textvqa/textvqa_accuracy
+  metric_minimize: false
+  log_interval: 100
+  snapshot_interval: 1000
+  seed: 3
+  load_tap: false
+
+  # logger_level: debug
+
